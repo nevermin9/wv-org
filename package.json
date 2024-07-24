@@ -1,0 +1,25 @@
+{
+  "name": "wv-org",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start:ssr": "npm run start -w=./apps/wv-ssr",
+    "dev:ssr": "npm run dev -w=./apps/wv-ssr"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "workspaces": [
+    "apps/*",
+    "libs/*"
+  ],
+  "dependencies": {
+    "typescript": "^5.5.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.9",
+    "tslib": "^2.6.3"
+  }
+}

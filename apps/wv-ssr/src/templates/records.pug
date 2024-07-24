@@ -1,0 +1,28 @@
+extends layouts/default.pug
+
+block content
+  h1 Last records
+
+  form(method="GET" action="/records")
+    label(for="search") Look up for a record by category
+    - const q = query || ''
+    input(type="text" name="q" id="search" value=q )
+    button(type="submit") Search
+
+  table
+    thead
+      tr
+        th Category
+        th Subcategory
+        th Amount
+        th Time
+        th(colspan="1")
+    tbody
+      each r in records
+        tr
+          td= `${ r.category }`
+          td= `${ r.subcategory }`
+          td= `${ r.amount }`
+          td= `${ r.timestamp }`
+          td
+            a(href=`/records/${r.id}`) Edit
