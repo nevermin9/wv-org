@@ -193,6 +193,37 @@ const records = [
   },
 ]
 
+// render and data should be separated
+class UserRecord {
+  static generateBlank() {
+    return {
+      id: 0,
+      category: "",
+      subcategory: "",
+      amount: "",
+      timestamp: "",
+    }
+  }
+
+  static generateId() {
+    return Math.floor(Math.random() * 100000)
+  }
+
+  public id: number
+  public category: string
+  public subcategory: string
+  public amount: string
+  public timestamp: string
+
+  constructor({ category, subcategory, amount, timestamp }: Record<string, string>) {
+    this.id = UserRecord.generateId()
+    this.category = category
+    this.subcategory = subcategory
+    this.amount = amount
+    this.timestamp = timestamp
+  }
+}
+
 const Records = {
   search: (query: string) => {
     return render("records", {
@@ -210,12 +241,34 @@ const Records = {
       records,
     })
   },
+
+  newRecord: () => {
+    return render("new-record", {
+      title: "New record",
+      record: UserRecord.generateBlank(),
+    })
+  },
+
+  editRecord: (id: number) => {
+    const record = records.find((r) => r.id === id)
+    if (!record) {
+      return render("404", {
+        title: "Record not found",
+      })
+    }
+    return render("edit-record", {
+      title: "Edit record",
+      record,
+    })
+  },
 }
 
 const server = createServer(async (req, res) => {
   const url = new URL(req.url || "", `http://${req.headers.host}`)
   const pathname = url.pathname
-  console.log(`incoming message: ${req.method?.toUpperCase()} ${url.href}`)
+  const method = req.method?.toUpperCase()
+
+  console.log(`incoming message: ${method} ${url.href}`)
   if (pathname === "/") {
     res.writeHead(308, {
       Location: `/records`,
@@ -235,7 +288,32 @@ const server = createServer(async (req, res) => {
     return
   }
 
-  if (req.url === "/login" && req.method === "POST") {
+  if (pathname === "/records/new" && method === "GET") {
+    const page = Records.newRecord()
+    res.end(page)
+    return
+  }
+
+  if (pathname === "/records/new" && method === "POST") {
+    const body = await AuthForm.read(req)
+    const recordData = Object.fromEntries(body.entries())
+    const record = new UserRecord(recordData)
+    records.push(record)
+    res.writeHead(303, {
+      Location: `/records`,
+    })
+    res.end()
+    return
+  }
+
+  const [path, id] = pathname.split("/").slice(1)
+  const numberId = id ? parseInt(id) : 0
+  if (path === "records" && !Number.isNaN(numberId) && numberId && method === "GET") {
+    const page = Records.editRecord(numberId)
+    res.end(page)
+  }
+
+  if (req.url === "/login" && method === "POST") {
     const body = await AuthForm.read(req)
     console.log({ name: body.get("name"), password: body.get("password") })
     res.end("ok")

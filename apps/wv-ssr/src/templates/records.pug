@@ -26,3 +26,9 @@ block content
           td= `${ r.timestamp }`
           td
             a(href=`/records/${r.id}`) Edit
+
+  a(href="/records/new") New record
+
+  script.
+    document.getElementById('search').focus()
+    console.log("Hello from records.pug!")

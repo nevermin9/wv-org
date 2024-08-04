@@ -1,7 +1,7 @@
 extends layouts/default.pug
 
 block content
-  h1 New record
+  h1 Edit record #{record.id}
 
   form(method="POST" action="/records/new")
     fieldset
@@ -68,4 +68,5 @@ block content
       button(type="submit") Save new record
 
       a(href="/records") Back
+
 
