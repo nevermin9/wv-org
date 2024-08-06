@@ -1,54 +1,58 @@
-import { ClientRequest, IncomingMessage, createServer } from "node:http"
-import { URLSearchParams } from "node:url"
-// import Handlebars from "handlebars"
-import { resolve } from "node:path"
-import pug from "pug"
+import { ClientRequest, IncomingMessage, createServer } from "node:http";
+import { URLSearchParams } from "node:url";
+import { resolve } from "node:path";
+import pug from "pug";
 
-const __dirname = new URL(".", import.meta.url).pathname
-const templatesDir = resolve(__dirname, "./templates")
+/**
+ * - remove extra deps
+ * - read svelte source, how they handle folder based routing
+ */
+
+const __dirname = new URL(".", import.meta.url).pathname;
+const templatesDir = resolve(__dirname, "./templates");
 
 const create_render = (basePath: string) => {
   return (name: string, context: Record<string, any>) => {
     //const options = { cache: true } only in production
     return pug.renderFile(`${basePath}/${name}.pug`, { ...context }, (err, html) => {
       if (err) {
-        console.error(err)
-        return
+        console.error(err);
+        return;
       }
-      return html
-    })
-  }
-}
+      return html;
+    });
+  };
+};
 
-const render = create_render(templatesDir)
+const render = create_render(templatesDir);
 
 const AuthForm = {
   read: async (req: IncomingMessage): Promise<URLSearchParams> => {
-    const buffer = []
+    const buffer = [];
     for await (const chunk of req) {
-      buffer.push(chunk)
+      buffer.push(chunk);
     }
-    const body = Buffer.concat(buffer).toString()
-    return new URLSearchParams(body)
+    const body = Buffer.concat(buffer).toString();
+    return new URLSearchParams(body);
   },
-}
+};
 
 interface FormReader {
-  read(): Promise<URLSearchParams>
+  read(): Promise<URLSearchParams>;
 }
 
 interface Route {
-  path: string
-  method: string
-  reader?: FormReader
-  sender?: (req: IncomingMessage, res: ClientRequest) => void
+  path: string;
+  method: string;
+  reader?: FormReader;
+  sender?: (req: IncomingMessage, res: ClientRequest) => void;
 }
 
 const userData = {
   name: "John Doe",
   email: "john.doe@gmail.com",
   balance: "1239904.42",
-}
+};
 
 const records = [
   {
@@ -191,7 +195,7 @@ const records = [
     amount: "-90.90",
     timestamp: "2023-03-20T21:45:50Z",
   },
-]
+];
 
 // render and data should be separated
 class UserRecord {
@@ -202,25 +206,25 @@ class UserRecord {
       subcategory: "",
       amount: "",
       timestamp: "",
-    }
+    };
   }
 
   static generateId() {
-    return Math.floor(Math.random() * 100000)
+    return Math.floor(Math.random() * 100000);
   }
 
-  public id: number
-  public category: string
-  public subcategory: string
-  public amount: string
-  public timestamp: string
+  public id: number;
+  public category: string;
+  public subcategory: string;
+  public amount: string;
+  public timestamp: string;
 
   constructor({ category, subcategory, amount, timestamp }: Record<string, string>) {
-    this.id = UserRecord.generateId()
-    this.category = category
-    this.subcategory = subcategory
-    this.amount = amount
-    this.timestamp = timestamp
+    this.id = UserRecord.generateId();
+    this.category = category;
+    this.subcategory = subcategory;
+    this.amount = amount;
+    this.timestamp = timestamp;
   }
 }
 
@@ -229,95 +233,119 @@ const Records = {
     return render("records", {
       title: "Your records",
       records: records.filter((r) => {
-        return r.category.toLowerCase().includes(query)
+        return r.category.toLowerCase().includes(query);
       }),
       query,
-    })
+    });
   },
 
   all: () => {
     return render("records", {
       title: "Your records",
       records,
-    })
+    });
   },
 
   newRecord: () => {
     return render("new-record", {
       title: "New record",
       record: UserRecord.generateBlank(),
-    })
+    });
   },
 
   editRecord: (id: number) => {
-    const record = records.find((r) => r.id === id)
+    const record = records.find((r) => r.id === id);
     if (!record) {
       return render("404", {
         title: "Record not found",
-      })
+      });
     }
     return render("edit-record", {
       title: "Edit record",
       record,
-    })
+    });
   },
-}
+};
+
+const readBody = async (req: IncomingMessage) => {
+  const buffer = [];
+  for await (const chunk of req) {
+    console.log({ chunk_plain: chunk });
+    console.log({ chunk: chunk.toString() });
+    buffer.push(chunk);
+  }
+  return Buffer.concat(buffer).toString();
+};
 
 const server = createServer(async (req, res) => {
-  const url = new URL(req.url || "", `http://${req.headers.host}`)
-  const pathname = url.pathname
-  const method = req.method?.toUpperCase()
+  const url = new URL(req.url || "", `http://${req.headers.host}`);
+  const pathname = url.pathname;
+  const method = req.method?.toUpperCase();
+  const body = await readBody(req);
 
-  console.log(`incoming message: ${method} ${url.href}`)
+  console.log(`incoming message: ${method} ${url.href}`);
   if (pathname === "/") {
     res.writeHead(308, {
       Location: `/records`,
-    })
-    res.end()
-    return
-  }
-  if (pathname === "/records" && !url.searchParams.has("q")) {
-    const page = Records.all()
-    res.end(page)
-    return
+    });
+    res.end();
+    return;
   }
 
-  if (pathname === "/records" && url.searchParams.has("q")) {
-    const search = url.searchParams.get("q") || ""
-    res.end(Records.search(search))
-    return
+  if (pathname === "/get-greet") {
+    res.end(`
+      <div class="greet">
+         <h2>
+            Hello, ${userData.name}!
+         </h2>
+      </div>
+    `);
+    return;
+  }
+
+  if (pathname === "/records" && method === "GET") {
+    const page = Records.all();
+    res.end(page);
+    return;
+  }
+
+  const search = new URLSearchParams(body);
+  if (pathname === "/records" && search.has("q") && method === "POST") {
+    const qsearch = search.get("q") || "";
+    res.end(Records.search(qsearch));
+    return;
   }
 
   if (pathname === "/records/new" && method === "GET") {
-    const page = Records.newRecord()
-    res.end(page)
-    return
+    const page = Records.newRecord();
+    res.end(page);
+    return;
   }
 
   if (pathname === "/records/new" && method === "POST") {
-    const body = await AuthForm.read(req)
-    const recordData = Object.fromEntries(body.entries())
-    const record = new UserRecord(recordData)
-    records.push(record)
+    const body = await AuthForm.read(req);
+    const recordData = Object.fromEntries(body.entries());
+    const record = new UserRecord(recordData);
+    records.push(record);
     res.writeHead(303, {
       Location: `/records`,
-    })
-    res.end()
-    return
+    });
+    res.end();
+    return;
   }
 
-  const [path, id] = pathname.split("/").slice(1)
-  const numberId = id ? parseInt(id) : 0
+  const [path, id] = pathname.split("/").slice(1);
+  const numberId = id ? parseInt(id) : 0;
   if (path === "records" && !Number.isNaN(numberId) && numberId && method === "GET") {
-    const page = Records.editRecord(numberId)
-    res.end(page)
+    const page = Records.editRecord(numberId);
+    res.end(page);
   }
 
   if (req.url === "/login" && method === "POST") {
-    const body = await AuthForm.read(req)
-    console.log({ name: body.get("name"), password: body.get("password") })
-    res.end("ok")
+    const body = await AuthForm.read(req);
+    console.log({ name: body.get("name"), password: body.get("password") });
+    res.end("ok");
   }
-})
+});
 
-server.listen(3000)
+server.listen(3000);

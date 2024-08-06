@@ -3,11 +3,29 @@ extends layouts/default.pug
 block content
   h1 Last records
 
+  button(
+    type="button"
+    hx-post="/get-greet"
+    hx-target="#greet"
+    hx-swap="outerHTML"
+    hx-trigger="click, keyup[ctrlKey && key === 'l'] from:body"
+    hx-vals='{"name": "World"}'
+  ) Get greet
+
+  #greet
+
+  #records
+
   form(method="GET" action="/records")
     label(for="search") Look up for a record by category
     - const q = query || ''
     input(type="text" name="q" id="search" value=q )
-    button(type="submit") Search
+    button(
+      hx-post="/records"
+      hx-target="#records"
+      hx-include="#search"
+    ) Search
+    //button(type="submit") Search
 
   table
     thead
