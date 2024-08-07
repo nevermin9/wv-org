@@ -303,6 +303,10 @@ const server = createServer(async (req, res) => {
     return;
   }
 
+  if (pathname === "/get-popover") {
+    res.end(render("popover", { title: "Popover title", content: "Popover content" }));
+  }
+
   if (pathname === "/records" && method === "GET") {
     const page = Records.all();
     res.end(page);

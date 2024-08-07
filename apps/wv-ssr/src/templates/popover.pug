@@ -1,0 +1,26 @@
+extends layouts/default.pug
+
+block styles
+  style
+    include popover.css
+
+block content
+  h1 Popover 101
+
+  button(
+    type="button"
+    popovertarget="popover-block"
+    popovertargetaction="show"
+  ) click to open popover
+  |
+  |
+  |
+  button(
+    type="button"
+    popovertarget="popover-block"
+    popovertargetaction="hide"
+  ) click to close popover
+
+
+  .popover(id="popover-block" popover) a popover block
+
