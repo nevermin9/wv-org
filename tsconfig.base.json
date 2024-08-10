@@ -19,6 +19,9 @@
     "paths": {
       "@wv-org/dom": [
         "libs/dom/index.ts"
+      ],
+      "@wv-org/ui-lib": [
+        "libs/ui-lib/index.ts"
       ]
     },
     "strict": true,

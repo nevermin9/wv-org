@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": [
+      "es2020",
+      "dom"
+    ],
+    "rootDir": ".",
+    "outDir": "../../dist/libs/ui-lib",
+    "declaration": true,
+    "types": []
+  },
+  "include": [
+    "./index.ts"
+  ],
+  "exclude": [
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts"
+  ]
+}
