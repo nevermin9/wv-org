@@ -16,7 +16,8 @@
     "libs/*"
   ],
   "dependencies": {
-    "typescript": "^5.5.3"
+    "typescript": "^5.5.3",
+    "vue": "^3.4.37"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.1.6",

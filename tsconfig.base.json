@@ -2,34 +2,35 @@
   "compileOnSave": false,
   "compilerOptions": {
     "rootDir": ".",
+    "baseUrl": ".",
+    "target": "es2016",
     "sourceMap": true,
-    "declaration": false,
+    "module": "esnext",
     "moduleResolution": "node",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
+    "declaration": false,
     "importHelpers": true,
-    "target": "es2017",
-    "module": "ESNext",
     "lib": [
-      "es2020"
+      "esnext"
     ],
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
-    "baseUrl": ".",
     "paths": {
-      "@wv-org/dom": [
-        "libs/dom/index.ts"
-      ],
-      "@wv-org/ui-lib": [
-        "libs/ui-lib/index.ts"
+      "@wv-org/*": [
+        "libs/*/src"
       ]
     },
     "strict": true,
     "esModuleInterop": true,
+    "noEmit": true,
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "allowImportingTsExtensions": true,
+    "allowArbitraryExtensions": true,
+    "verbatimModuleSyntax": true,
+    "noImplicitOverride": true,
+    "allowSyntheticDefaultImports": true,
+    "noPropertyAccessFromIndexSignature": true
   },
   "exclude": [
     "node_modules",
