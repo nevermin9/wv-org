@@ -2,6 +2,9 @@ import { ClientRequest, IncomingMessage, createServer } from "node:http";
 import { URLSearchParams } from "node:url";
 import { resolve } from "node:path";
 import pug from "pug";
+import { createReadStream } from "node:fs";
+import engine from "./nunj"
+
 
 /**
  * - remove extra deps
@@ -289,6 +292,13 @@ const server = createServer(async (req, res) => {
       Location: `/records`,
     });
     res.end();
+    return;
+  }
+
+  if (pathname === "/nunj") {
+    const page = engine.render("second.html", { username: "Julio", age: 28 });
+    const page2 = engine.render("index.njk", { username: "Chrysto" })
+    res.end([page, page2].join(" "));
     return;
   }
 

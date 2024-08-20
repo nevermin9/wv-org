@@ -12,10 +12,14 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^20.14.10",
+    "@types/nunjucks": "^3.2.6",
     "@types/pug": "^2.0.10",
     "tsx": "^4.16.2"
   },
   "dependencies": {
+    "chokidar": "^3.6.0",
+    "handlebars": "^4.7.8",
+    "nunjucks": "^3.2.4",
     "pug": "^3.0.3"
   }
 }
