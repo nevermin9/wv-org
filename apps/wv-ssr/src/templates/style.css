@@ -1,0 +1,67 @@
+@font-face {
+  /* font-family: "JetBrains Mono", monospace; */
+  font-family: "MyUniqueFontName";
+  src: url("/public/font/JetBrainsMono-Regular.ttf") format("ttf");
+  font-style: normal;
+  font-weight: 500;
+}
+:root {
+  --text-color-light: #000;
+  --text-color-dark: #fff;
+  --text-color-alt-light: #666;
+  --text-color-alt-dark: #aaa;
+  --background-color-light: #fff;
+  --background-color-dark: rgb(46, 46, 46);
+  --background-color-alt-light: #080707;
+  --background-color-alt-dark: #222;
+
+  --celestial-blue: #4d9de0ff;
+  --indian-red: #e15554ff;
+  --saffron: #e1bc29ff;
+  --jade: #3bb273ff;
+  --royal-purple: #7768aeff;
+
+  --l2-pad: 64px;
+  --l-pad: 32px;
+}
+
+html {
+  height: 100%;
+  color: var(--text-color-dark);
+  font-family: "MyUniqueFontName";
+  font-size: 16px;
+}
+
+body { min-height: 100%; background-color: var(--background-color-dark); }
+
+.container {
+  height: 100%;
+  padding: var(--l-pad);
+}
+
+.circle {
+  width: 6rem;
+  height: 6rem;
+  clip-path: circle(50% at 50% 50%);
+  margin: 10px;
+  background-color: white;
+}
+
+.inset {
+  width: 10rem;
+  height: 10rem;
+  clip-path: inset(10px 20px 50% 0%);
+  background-color: white;
+}
+
+.tabs-container {
+  display: flex;
+  gap: .5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.tabs-container.tabs-container--clip-path {
+  background-color: var(--celestial-blue);
+}
+

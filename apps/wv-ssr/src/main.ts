@@ -1,9 +1,10 @@
 import { ClientRequest, IncomingMessage, createServer } from "node:http";
 import { URLSearchParams } from "node:url";
-import { resolve } from "node:path";
+import { resolve, join } from "node:path";
 import pug from "pug"
 import { createReadStream } from "node:fs";
 import engine from "./nunj"
+import { createStaticHandler } from "./static";
 // find . -name "*.ts" | entr -r tsc --noEmit -p ./apps/wv-ssr/tsconfig.json
 
 /**
@@ -12,7 +13,12 @@ import engine from "./nunj"
  */
 
 const __dirname = new URL(".", import.meta.url).pathname;
+const STATIC_PATHNAME = "/public";
+const STATIC_DIR_PATH = resolve(__dirname, `.${STATIC_PATHNAME}`)
+const NOT_FOUND_PAGE = resolve(STATIC_DIR_PATH, "./404.html")
 const templatesDir = resolve(__dirname, "./templates");
+
+const staticHandler = createStaticHandler(STATIC_DIR_PATH, NOT_FOUND_PAGE)
 
 const create_render = (basePath: string) => {
   return (name: string, context: Record<string, any>) => {
@@ -301,16 +307,16 @@ const server = createServer(async (req, res) => {
       name: "Anton",
       tabs: [
         {
-          text: "Payments"
+          text: "payments"
         },
         {
-          text: "Balances"
+          text: "balances"
         },
         {
-          text: "Customers"
+          text: "customers"
         },
         {
-          text: "Billings"
+          text: "billings"
         },
       ],
     });
