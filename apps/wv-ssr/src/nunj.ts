@@ -1,9 +1,11 @@
 import nunjucks from "nunjucks";
 import { resolve } from "node:path";
 
-const templatesDir = resolve(import.meta.dirname, "./nunj-templates")
+const TEMPLATES_FOLDER_NAME = "templates"
 
-const engine = nunjucks.configure(templatesDir, {
+const templatesDirPath = resolve(import.meta.dirname, `./${TEMPLATES_FOLDER_NAME}`)
+
+const engine = nunjucks.configure(templatesDirPath, {
   watch: true,
   noCache: true,
 });

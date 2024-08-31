@@ -1,10 +1,10 @@
 import { ClientRequest, IncomingMessage, createServer } from "node:http";
 import { URLSearchParams } from "node:url";
 import { resolve } from "node:path";
-import pug from "pug";
+import pug from "pug"
 import { createReadStream } from "node:fs";
 import engine from "./nunj"
-
+// find . -name "*.ts" | entr -r tsc --noEmit -p ./apps/wv-ssr/tsconfig.json
 
 /**
  * - remove extra deps
@@ -296,9 +296,25 @@ const server = createServer(async (req, res) => {
   }
 
   if (pathname === "/nunj") {
-    const page = engine.render("second.html", { username: "Julio", age: 28 });
-    const page2 = engine.render("index.njk", { username: "Chrysto" })
-    res.end([page, page2].join(" "));
+    const page = engine.render("index.html", {
+      title: "Index",
+      name: "Anton",
+      tabs: [
+        {
+          text: "Payments"
+        },
+        {
+          text: "Balances"
+        },
+        {
+          text: "Customers"
+        },
+        {
+          text: "Billings"
+        },
+      ],
+    });
+    res.end(page);
     return;
   }
 
