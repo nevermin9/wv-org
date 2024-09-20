@@ -10,6 +10,18 @@ console.log({ __dirname })
 // const STATIC_DIR_PATH = resolve(__dirname, `.${STATIC_PATHNAME}`);
 // const NOT_FOUND_PAGE = resolve(STATIC_DIR_PATH, "./404.html");
 
+const getName = () => {
+  return "anton";
+}
+
+class Person {
+  constructor({ name, age, city }) {
+    this.name = name;
+    this.age = age;
+    this.city = city;
+  }
+}
+
 
 const server = createServer(async (req, res) => {
   const router = await createRoutes({
