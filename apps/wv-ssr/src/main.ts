@@ -25,7 +25,7 @@ const server = createServer(async (req, res) => {
   const url = new URL(`http://${ req.headers.host }`);
   const pathname = url.pathname;
   console.log({ method: req.method, path: pathname })
-  console.log({ result: router.get(pathname) })
+  // console.log({ result: router.get(pathname) })
 
   res.end("helllll");
 });

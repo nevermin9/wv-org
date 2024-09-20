@@ -5,48 +5,58 @@ import { Script, createContext, runInContext } from "node:vm";
 // import Mustache from "mustache";
 
 const path = new URL(".", import.meta.url).pathname;
-const ENTRY_FILE_NAME = /\+page\.(ts|js)/;
+
+const isEntryFile = (p: string) => /\+page\.(ts|js)/.test(p);
 
 export const createRoutes = async (context: Context) => {
   const dir = await opendir(resolve(path, "./routes"));
 
   const entryFilesPaths: string[] = [];
   for await (const dirent of dir) {
-    if (ENTRY_FILE_NAME.test(dirent.name)) {
+    if (isEntryFile(dirent.name)) {
       entryFilesPaths.push(`${dirent.parentPath}/${dirent.name}`)
     }
-    console.log({ dirent, isDir: dirent.isDirectory(), match: ENTRY_FILE_NAME.test(dirent.name) })
+    console.log({ dirent, isDir: dirent.isDirectory(), match: isEntryFile(dirent.name) })
   }
-
 
   if (!entryFilesPaths.length) {
     console.log("no enrty files")
     return;
   }
+  const indexPath = entryFilesPaths[0];
 
   const promises = [];
   for (const p of entryFilesPaths) {
-    const stream = createReadStream(p);
-    promises.push(async () => {
-      const buff = [];
-      for await (const b of stream) {
-        buff.push(b);
+    const stream = createReadStream(indexPath, { encoding: "utf-8" });
+     promises.push(new Promise<{ content: string, filename: string }>(async (res) => {
+      console.log({ msg: "start" })
+      let c = "";
+      for await (const data of stream) {
+        c += data;
+        console.log({ msg: "add data", data })
       }
-      return Buffer.from(buff).toString();
-    });
+      res({ content: c, filename: p });
+    }));
+  }
+const doc_script = new Script(`const getController = (ctx)=>
+({
+getName: () => {
+return ctx.name;
+}
+});
+getController(context);
+`);
+  const doc_res = doc_script.runInNewContext({ context: { name: "anton" } })
+  console.log({ name: doc_res.getName() })
+
+  for await (const { content, filename } of promises) {
+    const script = new Script(`(ctx) => ${content}`, { filename });
+    const ctx = createContext({ ctx: context });
+    // console.log({ result: result.trim() });
   }
 
-  console.log({ msg: "creating the router" })
-  const map = new Map();
-  for await (const result of promises) {
-    const script = new Script(`((ctx) => ${result})(context)`);
-    const ctx = createContext({ context });
-    const what = await script.runInContext(ctx)();
-    map.set("/", what)
-  }
-
-  return map;
 
 
+  return {};
   // console.log({ dir })
 };

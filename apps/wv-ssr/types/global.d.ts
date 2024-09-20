@@ -7,10 +7,11 @@ type Context = {
   db: (model: string) => Model
 }
 
-type PageLoad = {
+type ControllerPayload = {
   url: URL
   params: Record<string, string>
 }
+
 
 declare var ctx: Context
 
