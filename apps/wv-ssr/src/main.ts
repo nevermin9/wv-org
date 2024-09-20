@@ -10,6 +10,18 @@ console.log({ __dirname })
 // const STATIC_DIR_PATH = resolve(__dirname, `.${STATIC_PATHNAME}`);
 // const NOT_FOUND_PAGE = resolve(STATIC_DIR_PATH, "./404.html");
 
+function* gen() {
+  while (true) {
+    yield 1;
+  }
+}
+
+
+
+function anton() {
+  return 'anton'
+}
+
 
 const server = createServer(async (req, res) => {
   const router = await createRoutes({
