@@ -1,62 +1,66 @@
-import { resolve } from "node:path";
-import { opendir } from "node:fs/promises";
+import { resolve, join } from "node:path";
+import { readdir } from "node:fs/promises";
 import { createReadStream } from "node:fs";
-import { Script, createContext, runInContext } from "node:vm";
-// import Mustache from "mustache";
+import { Script } from "node:vm";
 
 const path = new URL(".", import.meta.url).pathname;
 
 const isEntryFile = (p: string) => /\+page\.(ts|js)/.test(p);
 
-export const createRoutes = async (context: Context) => {
-  const dir = await opendir(resolve(path, "./routes"));
+const readRoutesDirs = async (root: string): Promise<Map<string, string>> => {
+  const routerMap = new Map<string, string>();
 
-  const entryFilesPaths: string[] = [];
-  for await (const dirent of dir) {
-    if (isEntryFile(dirent.name)) {
-      entryFilesPaths.push(`${dirent.parentPath}/${dirent.name}`)
+  const traverse = async (dir: string) => {
+    const entries = await readdir(dir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const fullPath = join(dir, entry.name);
+
+      if (entry.isDirectory()) {
+        await traverse(fullPath);
+      } else if (isEntryFile(entry.name)) {
+        const split = fullPath.split("/");
+        const index = split.indexOf("routes");
+        const route = `/${ split.slice(index + 1, -1).join("/") }`;
+        routerMap.set(route, fullPath);
+      }
     }
-    console.log({ dirent, isDir: dirent.isDirectory(), match: isEntryFile(dirent.name) })
-  }
+  };
 
-  if (!entryFilesPaths.length) {
-    console.log("no enrty files")
+  await traverse(root);
+  return routerMap;
+};
+
+export const createRoutes = async (context: Context) => {
+  const root = resolve(path, "./routes");
+  const routeMap = await readRoutesDirs(root);
+  console.log(Array.from(routeMap.keys()));
+
+  if (!routeMap.size) {
+    console.log("No entry files found");
     return;
   }
-  const indexPath = entryFilesPaths[0];
 
-  const promises = [];
-  for (const p of entryFilesPaths) {
-    const stream = createReadStream(indexPath, { encoding: "utf-8" });
-     promises.push(new Promise<{ content: string, filename: string }>(async (res) => {
-      console.log({ msg: "start" })
-      let c = "";
-      for await (const data of stream) {
-        c += data;
-        console.log({ msg: "add data", data })
-      }
-      res({ content: c, filename: p });
-    }));
-  }
-const doc_script = new Script(`const getController = (ctx)=>
-({
-getName: () => {
-return ctx.name;
-}
-});
-getController(context);
-`);
-  const doc_res = doc_script.runInNewContext({ context: { name: "anton" } })
-  console.log({ name: doc_res.getName() })
+  const controllers = new Map<string, Controller>();
 
-  for await (const { content, filename } of promises) {
-    const script = new Script(`(ctx) => ${content}`, { filename });
-    const ctx = createContext({ ctx: context });
-    // console.log({ result: result.trim() });
+  for (const [route, filePath] of routeMap.entries()) {
+    const content = await new Promise<string>((resolve, reject) => {
+      let data = '';
+      const stream = createReadStream(filePath, { encoding: "utf-8" });
+      stream.on('data', chunk => data += chunk);
+      stream.on('end', () => resolve(data));
+      stream.on('error', reject);
+    });
+
+    const script = new Script(`const c = (ctx) => ${content}; c(context);`, { filename: filePath });
+    const controller = script.runInNewContext({ context }) as Controller;
+    controllers.set(route, controller);
+    console.log({ script_result: controller.get({ params: { id: "kj" }, url: new URL("http://example.com") }) });
   }
 
+  for (const [route, con] of controllers.entries()) {
+    console.log({ route, con });
+  }
 
-
-  return {};
-  // console.log({ dir })
+  return controllers;
 };

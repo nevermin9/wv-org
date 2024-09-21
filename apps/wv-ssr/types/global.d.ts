@@ -12,6 +12,13 @@ type ControllerPayload = {
   params: Record<string, string>
 }
 
+interface Controller {
+  get(p: ControllerPayload): string
+  post(p: ControllerPayload): string
+  put(p: ControllerPayload): string
+  delete(p: ControllerPayload): string
+}
+
 
 declare var ctx: Context
 
