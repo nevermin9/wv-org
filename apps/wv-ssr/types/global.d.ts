@@ -5,12 +5,12 @@ interface Model {
 type Context = {
   render: (path: string, data: Record<string, unknown> | void) => string
   db: (model: string) => Model
-}
+};
 
 type ControllerPayload = {
   url: URL
   params: Record<string, string>
-}
+};
 
 interface Controller {
   get(p: ControllerPayload): string
@@ -20,7 +20,7 @@ interface Controller {
 }
 
 
-declare var ctx: Context
+declare const ctx: Context;
 
 // declare global {
 //   var ctx: Context

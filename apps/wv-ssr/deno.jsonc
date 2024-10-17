@@ -1,0 +1,12 @@
+{
+  "name": "wv-ssr",
+  "version": "1.0.0",
+  "tasks": {
+    "dev": "deno run -A --check --watch ./src/main.ts"
+  },
+  "exports": "./src/main.ts",
+  "imports": {
+    "@types/mustache": "npm:@types/mustache@^4.2.5",
+    "mustache": "npm:mustache@^4.2.0"
+  }
+}

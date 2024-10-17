@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "workspace": [
+    // applications
+    "./apps/wv-ssr",
+
+    // libraries
+    "./libs/dom",
+    "./libs/ui-lib"
+  ],
+  "compilerOptions": {
+    "checkJs": true,
+    "types": ["./apps/wv-ssr/types/global.d.ts", "node"]
+  }
+}
