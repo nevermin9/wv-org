@@ -1,6 +1,6 @@
-import Mustache from "mustache";
+//import Mustache from "mustache";
 //import { resolve } from "node:path"
-import { createRoutes } from "./app/app.ts";
+import { testFn } from "./app/app.ts";
 
 const __dirname = new URL(".", import.meta.url).pathname;
 console.log({ __dirname });
@@ -15,26 +15,19 @@ console.log(import.meta)
 Deno.serve(
   { port: 3000 },
   async (req) => {
-    const router = await createRoutes({
-      db(model) {
-        return {
-          get(id: string) {
-            return { name: "Anton", age: 29 };
-          }
-        }
-      },
-      render: Mustache.render,
-    }) as Map<string, Controller>;
 
     const url = new URL(req.url);
     const pathname = url.pathname;
     console.log({ method: req.method, path: pathname, url: req.url });
-    const controller = router.get(pathname);
 
-    if (controller) {
-      return new Response(controller.get({ url, params: { id: "20" } }));
+    const isFound = await testFn(pathname);
+
+    if (isFound) {
+      const { params, controller } = isFound;
+      console.log("isFound", { params, controller });
     }
-    return new Response("404");
+
+    return new Response("Hello, world!");
   }
 )
 

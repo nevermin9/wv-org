@@ -6,6 +6,8 @@
   },
   "exports": "./src/main.ts",
   "imports": {
+    "@std/fs": "jsr:@std/fs@^1.0.4",
+    "@std/path": "jsr:@std/path@^1.0.6",
     "@types/mustache": "npm:@types/mustache@^4.2.5",
     "mustache": "npm:mustache@^4.2.0"
   }
