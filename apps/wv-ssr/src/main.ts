@@ -1,31 +1,17 @@
-import Mustache from "mustache";
-//import { resolve } from "node:path"
-// import { testFn } from "./app/app.ts";
+//import Mustache from "mustache";
 import { create_router } from "@wv-org/server-router";
 import { resolve } from "@std/path";
+import { render, set_base_template } from "./renderer.ts"
 
 const __dirname = new URL(".", import.meta.url).pathname;
-console.log({ __dirname });
-console.log({ dirname: import.meta.dirname })
 
-console.log(import.meta)
-
-// class HtmlResponse extends Response {
-//   constructor(body?: BodyInit | null, init?: ResponseInit) {
-//     const contentType = {
-//       "Content-Type": "text/html",
-//     };
-//     const _init = init || {};
-//     _init.headers = { ...(_init.headers || {}), ...contentType };
-//     super(body, _init);
-//   }
-// }
+set_base_template(resolve(__dirname, "./app/routes/+base.html"));
 
 const router = await create_router<Controller, Context>({
   dirPath: resolve(__dirname, "./app/routes"),
   context: {
     Response: Response,
-    render: Mustache.render,
+    render,
     db(model: string) {
       return {
         get(id: string) {
@@ -54,14 +40,9 @@ Deno.serve(
       const { params, controller } = isFound;
       const method = req.method;
 
-      const resp = controller[method.toLowerCase() as keyof Controller]?.({ params, url });
+      const resp = await controller[method.toLowerCase() as keyof Controller]?.({ params, url });
 
-      if (!resp) {
-        return new Response("Not Fount", { status: 404 });
-      }
-
-      console.log({ resp })
-      return resp
+      return resp ? resp : new Response("Not Fount", { status: 404 })
     }
 
     return new Response("Not Fount", { status: 404 });

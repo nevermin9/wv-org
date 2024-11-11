@@ -7,6 +7,7 @@
     "jsr:@std/path@^1.0.6": "1.0.6",
     "npm:@types/mustache@^4.2.5": "4.2.5",
     "npm:@types/node@*": "22.5.4",
+    "npm:@types/node@^22.7.8": "22.7.8",
     "npm:mustache@^4.2.0": "4.2.0"
   },
   "jsr": {
@@ -30,6 +31,12 @@
         "undici-types"
       ]
     },
+    "@types/node@22.7.8": {
+      "integrity": "sha512-a922jJy31vqR5sk+kAdIENJjHblqcZ4RmERviFsER4WJcEONqxKcjNOlk0q7OUfrF5sddT+vng070cdfMlrPLg==",
+      "dependencies": [
+        "undici-types"
+      ]
+    },
     "mustache@4.2.0": {
       "integrity": "sha512-71ippSywq5Yb7/tVYyGbkBggbU8H3u5Rz56fH60jGFgr8uHwxs+aSKeqmluIVzM0m0kB7xQjKS6qPfd0b2ZoqQ=="
     },
@@ -38,11 +45,15 @@
     }
   },
   "workspace": {
+    "dependencies": [
+      "jsr:@std/assert@1",
+      "jsr:@std/fs@^1.0.4",
+      "jsr:@std/path@^1.0.6",
+      "npm:@types/node@^22.7.8"
+    ],
     "members": {
       "apps/wv-ssr": {
         "dependencies": [
-          "jsr:@std/fs@^1.0.4",
-          "jsr:@std/path@^1.0.6",
           "npm:@types/mustache@^4.2.5",
           "npm:mustache@^4.2.0"
         ]

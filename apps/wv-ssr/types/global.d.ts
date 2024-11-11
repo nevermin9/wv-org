@@ -3,9 +3,10 @@ interface Model {
 }
 
 type Context = {
-  render: (path: string, data: Record<string, unknown> | void, partials: Record<string, string>) => string
+  render: (path: string, data: Record<string, unknown> | null, partials?: Record<string, string>) => Promise<string>
   db: (model: string) => Model
   Response: typeof Response
+  resolve?: (...p: string[]) => string
 };
 
 type ControllerPayload = {
